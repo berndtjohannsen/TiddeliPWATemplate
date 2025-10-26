@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A minimal PWA template">
+    <meta name="theme-color" content="#3b82f6">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/images/icons/icon-192.png">
+    
+    <!-- Tailwind CSS (generated) -->
+    <link rel="stylesheet" href="/css/tailwind.output.css">
+    
+    <title>Tiddeli PWA Template</title>
+</head>
+<body class="flex flex-col h-screen bg-gray-50">
+    
+    <!-- Top Navigation Bar -->
+    <header class="bg-blue-600 text-white shadow-md">
+        <div class="flex items-center justify-between px-4 py-3">
+            <!-- Menu Toggle Button -->
+            <button 
+                id="menu-toggle" 
+                class="p-2 hover:bg-blue-700 rounded-md transition-colors"
+                aria-label="Toggle menu"
+            >
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            
+            <!-- App Title -->
+            <h1 class="text-xl font-semibold">Tiddeli</h1>
+            
+            <!-- Placeholder for action buttons -->
+            <div class="w-10"></div>
+        </div>
+    </header>
+    
+    <!-- Side Drawer -->
+    <div 
+        id="drawer-backdrop" 
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+    ></div>
+    <aside 
+        id="drawer" 
+        class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform -translate-x-full transition-transform duration-300"
+    >
+        <div class="flex flex-col h-full">
+            <!-- Drawer Header -->
+            <div class="bg-blue-600 text-white p-4">
+                <h2 class="text-lg font-semibold">Menu</h2>
+            </div>
+            
+            <!-- Drawer Content -->
+            <nav class="flex-1 overflow-y-auto p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="/" class="block px-4 py-2 hover:bg-gray-100 rounded-md">Home</a>
+                    </li>
+                    <li>
+                        <a href="/section1" class="block px-4 py-2 hover:bg-gray-100 rounded-md">Section 1</a>
+                    </li>
+                    <li>
+                        <a href="/section2" class="block px-4 py-2 hover:bg-gray-100 rounded-md">Section 2</a>
+                    </li>
+                    <li>
+                        <a href="/settings" class="block px-4 py-2 hover:bg-gray-100 rounded-md">Settings</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Drawer Footer (Version Info) -->
+            <div class="p-4 border-t">
+                <p class="text-sm text-gray-500">Version 1.0.0</p>
+            </div>
+        </div>
+    </aside>
+    
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto">
+        <!-- Dynamic content will be inserted here by router -->
+        <div class="p-4">
+            <h1 class="text-3xl font-bold mb-4">Welcome</h1>
+            <p class="text-gray-600">This is the home page of your PWA template.</p>
+            <p class="text-gray-600 mt-4">Start building your app here!</p>
+        </div>
+    </main>
+    
+    <!-- Bottom Navigation Bar -->
+    <nav class="bg-white border-t border-gray-200 shadow-md">
+        <div class="flex justify-around items-center px-2 py-2">
+            <!-- Home -->
+            <button 
+                class="bottom-nav-item flex flex-col items-center p-2 rounded-lg bg-blue-600 text-white transition-colors"
+                data-route="/"
+            >
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span class="text-xs">Home</span>
+            </button>
+            
+            <!-- Section 1 -->
+            <button 
+                class="bottom-nav-item flex flex-col items-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                data-route="/section1"
+            >
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <span class="text-xs">Section 1</span>
+            </button>
+            
+            <!-- Section 2 -->
+            <button 
+                class="bottom-nav-item flex flex-col items-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                data-route="/section2"
+            >
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span class="text-xs">Section 2</span>
+            </button>
+            
+            <!-- Settings -->
+            <button 
+                class="bottom-nav-item flex flex-col items-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                data-route="/settings"
+            >
+                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs">Settings</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- JavaScript Modules -->
+    <script type="module" src="/js/app.js"></script>
+    
+</body>
+</html>

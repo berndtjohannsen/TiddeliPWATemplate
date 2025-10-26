@@ -1,0 +1,26 @@
+/**
+ * Tailwind CSS Source File
+ * DO NOT EDIT tailwind.output.css directly
+ * Run: npx tailwindcss -i ./css/styles.css -o ./css/tailwind.output.css --minify --watch
+ */
+
+/* Tailwind directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles */
+@layer base {
+  /* Set base font and colors */
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  /* Component styles can be added here */
+}
+
+@layer utilities {
+  /* Utility classes can be added here */
+}
