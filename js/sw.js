@@ -9,13 +9,14 @@ const CACHE_NAME = `tiddeli-pwa-v${APP_VERSION}`;
 
 // Files to cache on install
 const CACHE_ASSETS = [
-    './',
     'index.html',
     'css/tailwind.output.css',
     'js/app.js',
     'js/router.js',
     'js/config.js',
     'manifest.json',
+    'images/icons/icon-192.png',
+    'images/icons/icon-512.png',
     // Add more assets as needed
 ];
 
