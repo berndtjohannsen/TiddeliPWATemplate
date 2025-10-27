@@ -3,7 +3,7 @@
  * Handles offline functionality and caching
  */
 
-import { CACHE_NAME, APP_VERSION } from './config.js';
+import { CACHE_NAME, APP_VERSION } from 'js/config.js';
 
 // Files to cache on install
 const CACHE_ASSETS = [
