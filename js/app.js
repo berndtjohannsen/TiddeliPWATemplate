@@ -29,7 +29,7 @@ function initApp() {
  */
 async function registerServiceWorker() {
     try {
-        const registration = await navigator.serviceWorker.register('/js/sw.js');
+        const registration = await navigator.serviceWorker.register('js/sw.js');
         console.log('Service Worker registered:', registration);
         
         // Check for updates

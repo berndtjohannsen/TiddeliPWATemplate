@@ -7,13 +7,13 @@ import { CACHE_NAME, APP_VERSION } from './config.js';
 
 // Files to cache on install
 const CACHE_ASSETS = [
-    '/',
-    '/index.html',
-    '/css/tailwind.output.css',
-    '/js/app.js',
-    '/js/router.js',
-    '/js/config.js',
-    '/manifest.json',
+    './',
+    'index.html',
+    'css/tailwind.output.css',
+    'js/app.js',
+    'js/router.js',
+    'js/config.js',
+    'manifest.json',
     // Add more assets as needed
 ];
 
