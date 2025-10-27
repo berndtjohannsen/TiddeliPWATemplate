@@ -3,7 +3,9 @@
  * Handles offline functionality and caching
  */
 
-import { CACHE_NAME, APP_VERSION } from 'js/config.js';
+// App configuration (copied from config.js to avoid import issues)
+const APP_VERSION = '1.0.0';
+const CACHE_NAME = `tiddeli-pwa-v${APP_VERSION}`;
 
 // Files to cache on install
 const CACHE_ASSETS = [
