@@ -109,6 +109,12 @@ TiddeliPWATemplate/
 - **Tailwind CLI**: For CSS compilation
 - **Git**: Version control (user managed)
 
+# Build CSS**
+   ```bash
+   npx tailwindcss -i ./css/styles.css -o ./css/tailwind.output.css --minify --watch
+   ```
+
+
 # Testing
 - Manual testing on Android devices
 - Desktop browser testing
