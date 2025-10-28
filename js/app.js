@@ -39,7 +39,7 @@ function initApp() {
 async function registerServiceWorker() {
     try {
         // Pass version to service worker via query string
-        const swUrl = `js/sw.js?v=${encodeURIComponent(APP_VERSION)}`;
+        const swUrl = `sw.js?v=${encodeURIComponent(APP_VERSION)}`;
         const registration = await navigator.serviceWorker.register(swUrl);
         console.log('Service Worker registered:', registration);
         
