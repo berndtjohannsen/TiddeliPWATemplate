@@ -80,39 +80,40 @@ self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') {
         return;
     }
-    
+
+    const req = event.request;
+    const url = new URL(req.url);
+
+    const isNavigation = req.mode === 'navigate' || (req.destination === 'document');
+    const isHtml = req.headers.get('accept')?.includes('text/html');
+    const isConfig = url.pathname.endsWith('/js/config.js');
+
+    // Network-first for HTML navigations and config.js to pick up new versions quickly
+    if (isNavigation || isHtml || isConfig) {
+        event.respondWith(
+            fetch(req)
+                .then((networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        const toCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(req, toCache));
+                    }
+                    return networkResponse;
+                })
+                .catch(() => caches.match(req))
+        );
+        return;
+    }
+
+    // Cache-first for other GET requests
     event.respondWith(
-        caches.match(event.request)
-            .then((cachedResponse) => {
-                // Return cached version if available
-                if (cachedResponse) {
-                    return cachedResponse;
-                }
-                
-                // Otherwise fetch from network
-                return fetch(event.request)
-                    .then((response) => {
-                        // Don't cache non-successful responses
-                        if (!response || response.status !== 200) {
-                            return response;
-                        }
-                        
-                        // Clone the response (streams can only be consumed once)
-                        const responseToCache = response.clone();
-                        
-                        // Cache the new response
-                        caches.open(CACHE_NAME)
-                            .then((cache) => {
-                                cache.put(event.request, responseToCache);
-                            });
-                        
-                        return response;
-                    });
-            })
-            .catch(() => {
-                // Fallback if both cache and network fail
-                // Could return an offline page here
-                console.log('[Service Worker] Fetch failed');
-            })
+        caches.match(req).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            return fetch(req).then((response) => {
+                if (!response || response.status !== 200) return response;
+                const responseToCache = response.clone();
+                caches.open(CACHE_NAME).then((cache) => cache.put(req, responseToCache));
+                return response;
+            });
+        })
     );
 });

@@ -27,6 +27,13 @@ function initApp() {
     // Register service worker
     if ('serviceWorker' in navigator) {
         registerServiceWorker();
+        // Auto-reload once when a new SW takes control to pick up fresh assets
+        let reloadedForUpdate = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (reloadedForUpdate) return;
+            reloadedForUpdate = true;
+            window.location.reload();
+        });
     }
     
     // Setup UI event listeners
