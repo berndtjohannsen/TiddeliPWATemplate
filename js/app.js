@@ -159,6 +159,10 @@ function setupInstallPromptHandlers() {
         if (!isStandalone() && canShowBanner()) {
             showBanner();
         }
+        // Make sure Install button is visible now that prompt is available
+        if (bannerInstall) {
+            bannerInstall.classList.remove('hidden');
+        }
     });
 
     // If the event already fired before handlers were attached, show UI now
@@ -168,6 +172,18 @@ function setupInstallPromptHandlers() {
         }
         if (!isStandalone() && canShowBanner()) {
             showBanner();
+        }
+        if (bannerInstall) {
+            bannerInstall.classList.remove('hidden');
+        }
+    }
+
+    // Always show a friendly banner on first eligible visit, even before the install event
+    // If install prompt isn't available yet, hide the Install button and only show OK
+    if (!isStandalone() && canShowBanner()) {
+        showBanner();
+        if (!deferredInstallPrompt && bannerInstall) {
+            bannerInstall.classList.add('hidden');
         }
     }
 
