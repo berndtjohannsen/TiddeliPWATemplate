@@ -18,6 +18,9 @@ function initApp() {
         versionEl.textContent = APP_VERSION;
     }
     
+    // Initialize install prompt handlers (Android/Chrome)
+    setupInstallPromptHandlers();
+
     // Initialize router
     initRouter();
     
@@ -93,6 +96,47 @@ function setupEventListeners() {
                 window.dispatchEvent(new PopStateEvent('popstate'));
             }
         });
+    });
+}
+
+/**
+ * Handle PWA install prompt flow for Android/Chrome
+ */
+let deferredInstallPrompt = null;
+function setupInstallPromptHandlers() {
+    const installItem = document.getElementById('install-app-item');
+    const installButton = document.getElementById('install-app-button');
+
+    // Listen for the beforeinstallprompt event and show our own install UI
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        if (installItem) {
+            installItem.classList.remove('hidden');
+        }
+    });
+
+    // Handle install button click to trigger the prompt
+    if (installButton) {
+        installButton.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) {
+                return;
+            }
+            deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            if (installItem) {
+                installItem.classList.add('hidden');
+            }
+            // Optionally track choice.outcome === 'accepted' | 'dismissed'
+        });
+    }
+
+    // When app is installed, hide install UI
+    window.addEventListener('appinstalled', () => {
+        if (installItem) {
+            installItem.classList.add('hidden');
+        }
     });
 }
 
