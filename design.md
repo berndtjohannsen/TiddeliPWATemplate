@@ -63,46 +63,38 @@ TiddeliPWATemplate/
   - Major: Breaking changes
   - Minor: New features (backward compatible)
   - Patch: Bug fixes
-- **Version storage**: Single source of truth in `js/config.js`
-- **Version display**: Shown in app drawer/menu footer
+- **Version storage (single source of truth)**: `js/config.js`
+- **Version display**: Shown in app drawer/menu footer (populated at runtime)
 
 ## Version Tracking Files
-1. **`js/config.js`** (PRIMARY/SINGLE SOURCE): 
-   - Contains version number as constant
-   - Read by application and build tools
-   - Format: `export const APP_VERSION = '1.0.0';`
+1. **`js/config.js`** (ONLY PLACE TO CHANGE): 
+   - Contains the version constant: `export const APP_VERSION = 'X.Y.Z';`
+   - UI and service worker derive their version from this value
    - **This is the only file you edit when updating version**
 
-2. **`manifest.json`** (AUTO-GENERATED or SYNCED):
-   - Browser expects version field for PWA
-   - Options for keeping in sync:
-     - **Option A**: Manually update both files (simple but error-prone)
-     - **Option B**: JavaScript reads from config.js and updates manifest at runtime (more complex)
-     - **Option C**: Build script copies version from config.js to manifest.json (recommended if using build tools)
-   - Since we're using vanilla JS with minimal build process, manually keeping them in sync is acceptable
+2. **`manifest.json`**:
+   - Does not include a `version` field (by design)
+   - Browsers do not require the manifest to have a version for PWA functionality
 
-3. **Service Worker Cache**:
-   - Cache name includes version (e.g., `cache-v1.0.0`)
-   - Version read from config.js at runtime
-   - Allows multiple versions to coexist
-   - Old caches cleaned up automatically
+3. **Service Worker (`js/sw.js`) and Cache**:
+   - `app.js` registers the SW with a query string: `js/sw.js?v=APP_VERSION`
+   - SW parses `v` from its own script URL and sets `CACHE_NAME = \`tiddeli-pwa-v${APP_VERSION}\``
+   - New versions create new cache names; activation cleans up old caches
 
 ## Update Mechanism
-- **Service worker registration**: Checks for updates on page load
-- **Update detection**: Compares service worker file hash
+- **Service worker registration**: Appends `?v=APP_VERSION` to SW URL; browser checks for updates on load
+- **Update detection**: Standard SW lifecycle (new file or URL triggers updatefound)
 - **Update strategy**:
-  1. New service worker downloads in background
-  2. User sees "Update available" notification
-  3. On user action, activate new service worker
-  4. Reload page to get new cached assets
-- **Cache management**: 
-  - Old cache deleted after new cache activated
-  - Graceful fallback if new version fails
+  1. New SW installs in background, using versioned cache name
+  2. On activation, old caches are deleted
+  3. Page reload picks up new cached assets
+  4. Optional UI prompt can be added for "Update available"
+ - **Cache management**: Graceful fallback if network/cache fails
 
 ## Version Display in UI
-- App drawer footer shows current version
-- Format: "Version 1.0.0" or "v1.0.0"
-- Clickable to show version history (optional)
+- `index.html` contains `Version <span id="app-version"></span>` in the drawer footer
+- `app.js` sets `#app-version` textContent from `APP_VERSION`
+- Format: "Version X.Y.Z" (can be themed)
 
 # Development tools:
 - **Live Server**: For development and testing

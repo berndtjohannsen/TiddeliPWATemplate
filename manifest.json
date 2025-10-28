@@ -2,7 +2,6 @@
   "name": "Tiddeli PWA Template",
   "short_name": "Tiddeli",
   "description": "A minimal PWA template",
-  "version": "1.0.0",
   "manifest_version": 3,
   "start_url": "./",
   "display": "standalone",

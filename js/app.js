@@ -12,6 +12,12 @@ import { initRouter } from './router.js';
 function initApp() {
     console.log(`${APP_NAME} v${APP_VERSION} initialized`);
     
+    // Populate version in UI
+    const versionEl = document.getElementById('app-version');
+    if (versionEl) {
+        versionEl.textContent = APP_VERSION;
+    }
+    
     // Initialize router
     initRouter();
     
@@ -29,7 +35,9 @@ function initApp() {
  */
 async function registerServiceWorker() {
     try {
-        const registration = await navigator.serviceWorker.register('js/sw.js');
+        // Pass version to service worker via query string
+        const swUrl = `js/sw.js?v=${encodeURIComponent(APP_VERSION)}`;
+        const registration = await navigator.serviceWorker.register(swUrl);
         console.log('Service Worker registered:', registration);
         
         // Check for updates

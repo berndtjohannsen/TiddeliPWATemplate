@@ -3,8 +3,10 @@
  * Handles offline functionality and caching
  */
 
-// App configuration (copied from config.js to avoid import issues)
-const APP_VERSION = '1.0.0';
+// Derive version from service worker script URL query string
+// Fallback to '0.0.0' if not provided
+const swScriptUrl = new URL(self.location);
+const APP_VERSION = swScriptUrl.searchParams.get('v') || '0.0.0';
 const CACHE_NAME = `tiddeli-pwa-v${APP_VERSION}`;
 
 // Files to cache on install
