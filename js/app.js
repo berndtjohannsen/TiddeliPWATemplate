@@ -106,6 +106,36 @@ let deferredInstallPrompt = null;
 function setupInstallPromptHandlers() {
     const installItem = document.getElementById('install-app-item');
     const installButton = document.getElementById('install-app-button');
+    const banner = document.getElementById('install-banner');
+    const bannerInstall = document.getElementById('banner-install');
+    const bannerDismiss = document.getElementById('banner-dismiss');
+
+    // Snooze configuration
+    const SNOOZE_KEY = 'installBannerSnoozedUntil';
+    const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    function canShowBanner() {
+        const until = localStorage.getItem(SNOOZE_KEY);
+        if (!until) return true;
+        const untilMs = parseInt(until, 10);
+        return Number.isNaN(untilMs) || Date.now() > untilMs;
+    }
+
+    function showBanner() {
+        if (banner) {
+            banner.classList.remove('hidden');
+        }
+    }
+
+    function hideBanner() {
+        if (banner) {
+            banner.classList.add('hidden');
+        }
+    }
 
     // Listen for the beforeinstallprompt event and show our own install UI
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -113,6 +143,10 @@ function setupInstallPromptHandlers() {
         deferredInstallPrompt = e;
         if (installItem) {
             installItem.classList.remove('hidden');
+        }
+        // Auto-suggest banner for best experience if not standalone and not snoozed
+        if (!isStandalone() && canShowBanner()) {
+            showBanner();
         }
     });
 
@@ -128,7 +162,33 @@ function setupInstallPromptHandlers() {
             if (installItem) {
                 installItem.classList.add('hidden');
             }
+            hideBanner();
             // Optionally track choice.outcome === 'accepted' | 'dismissed'
+        });
+    }
+
+    // Banner actions
+    if (bannerInstall) {
+        bannerInstall.addEventListener('click', async () => {
+            if (!deferredInstallPrompt) {
+                // No prompt available; just hide banner
+                hideBanner();
+                return;
+            }
+            deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            deferredInstallPrompt = null;
+            hideBanner();
+            if (installItem) {
+                installItem.classList.add('hidden');
+            }
+        });
+    }
+    if (bannerDismiss) {
+        bannerDismiss.addEventListener('click', () => {
+            const until = Date.now() + SNOOZE_MS;
+            localStorage.setItem(SNOOZE_KEY, String(until));
+            hideBanner();
         });
     }
 
@@ -137,6 +197,7 @@ function setupInstallPromptHandlers() {
         if (installItem) {
             installItem.classList.add('hidden');
         }
+        hideBanner();
     });
 }
 

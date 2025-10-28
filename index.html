@@ -91,6 +91,16 @@
     
     <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto">
+        <!-- Soft Install Banner (hidden by default) -->
+        <div id="install-banner" class="hidden mx-4 mt-4 p-3 rounded-md bg-blue-50 border border-blue-200 text-blue-800 flex items-center justify-between">
+            <div class="pr-3 text-sm">
+                For the best experience, install this app on your device.
+            </div>
+            <div class="flex gap-2">
+                <button id="banner-dismiss" class="px-3 py-1 rounded-md text-blue-700 hover:bg-blue-100">Not now</button>
+                <button id="banner-install" class="px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700">Install</button>
+            </div>
+        </div>
         <!-- Dynamic content will be inserted here by router -->
         <div class="p-4">
             <h1 class="text-3xl font-bold mb-4">Welcome</h1>
