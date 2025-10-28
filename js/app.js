@@ -103,6 +103,13 @@ function setupEventListeners() {
  * Handle PWA install prompt flow for Android/Chrome
  */
 let deferredInstallPrompt = null;
+let beforeInstallEventQueued = false; // Set if event fires before handlers ready
+// Attach listener as early as possible so we don't miss the event on first load
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    beforeInstallEventQueued = true;
+});
 function setupInstallPromptHandlers() {
     const installItem = document.getElementById('install-app-item');
     const installButton = document.getElementById('install-app-button');
@@ -137,18 +144,25 @@ function setupInstallPromptHandlers() {
         }
     }
 
-    // Listen for the beforeinstallprompt event and show our own install UI
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredInstallPrompt = e;
+    // If event fires later, react to it (secondary listener still ok)
+    window.addEventListener('beforeinstallprompt', () => {
         if (installItem) {
             installItem.classList.remove('hidden');
         }
-        // Auto-suggest banner for best experience if not standalone and not snoozed
         if (!isStandalone() && canShowBanner()) {
             showBanner();
         }
     });
+
+    // If the event already fired before handlers were attached, show UI now
+    if (beforeInstallEventQueued) {
+        if (installItem) {
+            installItem.classList.remove('hidden');
+        }
+        if (!isStandalone() && canShowBanner()) {
+            showBanner();
+        }
+    }
 
     // Handle install button click to trigger the prompt
     if (installButton) {
