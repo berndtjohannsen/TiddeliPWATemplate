@@ -126,6 +126,7 @@ function setupInstallPromptHandlers() {
 
     // Snooze configuration
     const SNOOZE_KEY = 'installBannerSnoozedUntil';
+    const VERSION_SEEN_KEY = 'installBannerLastVersionSeen';
     const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
     function isStandalone() {
@@ -133,10 +134,21 @@ function setupInstallPromptHandlers() {
     }
 
     function canShowBanner() {
+        // Always show if version changed (new version available)
+        const lastVersionSeen = localStorage.getItem(VERSION_SEEN_KEY);
+        if (lastVersionSeen !== APP_VERSION) {
+            return true; // New version - show banner regardless of snooze
+        }
+        
+        // Same version - check snooze period
         const until = localStorage.getItem(SNOOZE_KEY);
         if (!until) return true;
         const untilMs = parseInt(until, 10);
         return Number.isNaN(untilMs) || Date.now() > untilMs;
+    }
+    
+    function markVersionSeen() {
+        localStorage.setItem(VERSION_SEEN_KEY, APP_VERSION);
     }
 
     function showBanner() {
@@ -155,11 +167,14 @@ function setupInstallPromptHandlers() {
         const existingInstall = banner.querySelector('#banner-install');
         if (!existingDismiss || !existingInstall) {
             banner.innerHTML = `
-                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <div style="padding-right: 12px; font-size: 14px; flex: 1;">For the best experience, install this app on your device.</div>
-                    <div style="display: flex; gap: 8px; flex-shrink: 0;">
-                        <button id="banner-dismiss" style="padding: 4px 12px; border-radius: 6px; background: transparent; color: #1e40af; border: none; white-space: nowrap; cursor: pointer;">Not now</button>
-                        <button id="banner-install" style="padding: 4px 12px; border-radius: 6px; background: #2563eb; color: white; border: none; white-space: nowrap; cursor: pointer;">Install</button>
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; gap: 12px; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px; font-size: 14px; line-height: 1.5; color: #1e3a8a;">
+                        <strong>📱 Install App</strong><br>
+                        <span style="font-size: 13px; color: #475569;">For the best experience, install this app on your device.</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-shrink: 0; align-items: center;">
+                        <button id="banner-dismiss" style="padding: 8px 16px; border-radius: 6px; background: transparent; color: #475569; border: 1px solid #cbd5e1; font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer; transition: background-color 0.2s;">Not now</button>
+                        <button id="banner-install" style="padding: 8px 16px; border-radius: 6px; background: #2563eb; color: white; border: none; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: background-color 0.2s;">Install</button>
                     </div>
                 </div>
             `;
@@ -167,21 +182,38 @@ function setupInstallPromptHandlers() {
             const newDismiss = document.getElementById('banner-dismiss');
             const newInstall = document.getElementById('banner-install');
             if (newDismiss) {
+                // Add hover effect
+                newDismiss.addEventListener('mouseenter', () => {
+                    newDismiss.style.backgroundColor = '#f1f5f9';
+                });
+                newDismiss.addEventListener('mouseleave', () => {
+                    newDismiss.style.backgroundColor = 'transparent';
+                });
                 newDismiss.addEventListener('click', () => {
                     const until = Date.now() + SNOOZE_MS;
                     localStorage.setItem(SNOOZE_KEY, String(until));
+                    markVersionSeen(); // Mark current version as seen
                     hideBanner();
                 });
             }
             if (newInstall) {
+                // Add hover effect
+                newInstall.addEventListener('mouseenter', () => {
+                    newInstall.style.backgroundColor = '#1d4ed8';
+                });
+                newInstall.addEventListener('mouseleave', () => {
+                    newInstall.style.backgroundColor = '#2563eb';
+                });
                 newInstall.addEventListener('click', async () => {
                     if (!deferredInstallPrompt) {
+                        markVersionSeen(); // Mark as seen even if install not available
                         hideBanner();
                         return;
                     }
                     deferredInstallPrompt.prompt();
                     const choice = await deferredInstallPrompt.userChoice;
                     deferredInstallPrompt = null;
+                    markVersionSeen(); // Mark version as seen after install attempt
                     hideBanner();
                     if (installItem) {
                         installItem.classList.add('hidden');
@@ -204,8 +236,9 @@ function setupInstallPromptHandlers() {
             margin: 0 !important;
             width: 100% !important;
             box-sizing: border-box !important;
-            background-color: #eff6ff !important;
-            border-bottom: 1px solid #bfdbfe !important;
+            background: linear-gradient(to bottom, #ffffff, #eff6ff) !important;
+            border-bottom: 2px solid #3b82f6 !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
         `;
         console.log('[Install] Banner shown:', banner.getBoundingClientRect());
     }
@@ -248,19 +281,26 @@ function setupInstallPromptHandlers() {
         }
     }
 
-    // Always show a friendly banner on first eligible visit, even before the install event
+    // Always show banner on first visit or when version changes
     // If install prompt isn't available yet, hide the Install button and only show Not now
     if (!isStandalone() && canShowBanner() && banner) {
         showBanner();
         if (!deferredInstallPrompt && bannerInstall) {
             bannerInstall.classList.add('hidden');
         }
-        console.log('[Install] Banner shown on first visit');
+        const lastVersionSeen = localStorage.getItem(VERSION_SEEN_KEY);
+        if (lastVersionSeen !== APP_VERSION) {
+            console.log(`[Install] Banner shown for new version (${APP_VERSION}, was ${lastVersionSeen || 'none'})`);
+        } else {
+            console.log('[Install] Banner shown on first visit');
+        }
     } else {
         console.log('[Install] Banner not shown:', {
             isStandalone: isStandalone(),
             canShow: canShowBanner(),
-            bannerExists: !!banner
+            bannerExists: !!banner,
+            currentVersion: APP_VERSION,
+            lastSeenVersion: localStorage.getItem(VERSION_SEEN_KEY)
         });
     }
 
@@ -286,12 +326,14 @@ function setupInstallPromptHandlers() {
         bannerInstall.addEventListener('click', async () => {
             if (!deferredInstallPrompt) {
                 // No prompt available; just hide banner
+                markVersionSeen(); // Mark as seen even if install not available
                 hideBanner();
                 return;
             }
             deferredInstallPrompt.prompt();
             const choice = await deferredInstallPrompt.userChoice;
             deferredInstallPrompt = null;
+            markVersionSeen(); // Mark version as seen after install attempt
             hideBanner();
             if (installItem) {
                 installItem.classList.add('hidden');
@@ -302,6 +344,7 @@ function setupInstallPromptHandlers() {
         bannerDismiss.addEventListener('click', () => {
             const until = Date.now() + SNOOZE_MS;
             localStorage.setItem(SNOOZE_KEY, String(until));
+            markVersionSeen(); // Mark current version as seen
             hideBanner();
         });
     }
