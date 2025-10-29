@@ -142,12 +142,14 @@ function setupInstallPromptHandlers() {
     function showBanner() {
         if (banner) {
             banner.classList.remove('hidden');
+            banner.style.display = 'flex';
         }
     }
 
     function hideBanner() {
         if (banner) {
             banner.classList.add('hidden');
+            banner.style.display = 'none';
         }
     }
 
