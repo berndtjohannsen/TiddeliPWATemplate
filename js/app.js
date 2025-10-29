@@ -88,17 +88,18 @@ function setupEventListeners() {
     
     // Bottom navigation click handlers
     const navItems = document.querySelectorAll('.bottom-nav-item');
+    console.log('[Bottom Nav] Found', navItems.length, 'navigation items');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            // Remove active state from all items
-            navItems.forEach(navItem => navItem.classList.remove('bg-blue-600'));
-            // Add active state to clicked item
-            item.classList.add('bg-blue-600');
+            console.log('[Bottom Nav] Item clicked:', item, 'Route:', item.dataset.route);
             
-            // Handle navigation
+            // Handle navigation - let the router update the active state
             const route = item.dataset.route;
-            if (route) {
-                // Navigate to route (handled by router)
+            if (route && window.router) {
+                // Navigate using router
+                window.router.navigate(route);
+            } else if (route) {
+                // Fallback: update URL and let popstate handle it
                 window.history.pushState({}, '', route);
                 window.dispatchEvent(new PopStateEvent('popstate'));
             }

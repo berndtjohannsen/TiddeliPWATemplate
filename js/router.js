@@ -35,6 +35,7 @@ let currentRoute = '/';
  * Initialize the router
  */
 export function initRouter() {
+    console.log('[Router] Initializing router');
     // Handle initial route
     handleRoute();
     
@@ -43,6 +44,7 @@ export function initRouter() {
     
     // Handle initial navigation
     const path = window.location.pathname;
+    console.log('[Router] Initial path:', path);
     navigate(path);
 }
 
@@ -51,6 +53,7 @@ export function initRouter() {
  */
 function handleRoute() {
     const path = window.location.pathname;
+    console.log('[Router] handleRoute called with path:', path);
     navigate(path);
 }
 
@@ -59,16 +62,53 @@ function handleRoute() {
  * @param {string} path - The path to navigate to
  */
 function navigate(path) {
+    console.log('[Router] navigate() called with path:', path);
     const route = routes[path] || routes['/'];
+    console.log('[Router] Route found:', route);
     
     // Update current route
     currentRoute = path;
+    
+    // Update URL if needed
+    if (window.location.pathname !== path) {
+        window.history.pushState({}, '', path);
+        console.log('[Router] Updated URL to:', path);
+    }
     
     // Update page title
     document.title = `${route.title} - Tiddeli PWA Template`;
     
     // Update main content
     updateMainContent(route.component);
+    
+    // Update bottom navigation active state
+    updateBottomNavActiveState(path);
+}
+
+/**
+ * Update bottom navigation active state based on current route
+ * @param {string} path - The current path
+ */
+function updateBottomNavActiveState(path) {
+    console.log('[Router] Updating bottom nav for path:', path);
+    const navItems = document.querySelectorAll('.bottom-nav-item');
+    console.log('[Router] Found', navItems.length, 'nav items');
+    navItems.forEach(item => {
+        const route = item.dataset.route;
+        console.log('[Router] Checking item with route:', route, 'matches?', route === path);
+        if (route === path) {
+            // Set as active (blue background, white text)
+            item.classList.add('bg-blue-600');
+            item.classList.add('text-white');
+            item.classList.remove('text-gray-600');
+            console.log('[Router] Set active - classes:', item.classList.toString());
+        } else {
+            // Set as inactive (no background, gray text)
+            item.classList.remove('bg-blue-600');
+            item.classList.remove('text-white');
+            item.classList.add('text-gray-600');
+        }
+    });
 }
 
 /**
