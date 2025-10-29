@@ -69,6 +69,7 @@ TiddeliPWATemplate/
 ## Version Tracking Files
 1. **`js/config.js`** (ONLY PLACE TO CHANGE): 
    - Contains the version constant: `export const APP_VERSION = 'X.Y.Z';`
+   - Also exports `CACHE_NAME = \`tiddeli-pwa-v${APP_VERSION}\`` for consistency
    - UI and service worker derive their version from this value
    - **This is the only file you edit when updating version**
 
@@ -76,24 +77,44 @@ TiddeliPWATemplate/
    - Does not include a `version` field (by design)
    - Browsers do not require the manifest to have a version for PWA functionality
 
-3. **Service Worker (`js/sw.js`) and Cache**:
-   - `app.js` registers the SW with a query string: `js/sw.js?v=APP_VERSION`
-   - SW parses `v` from its own script URL and sets `CACHE_NAME = \`tiddeli-pwa-v${APP_VERSION}\``
+3. **Service Worker (`sw.js`) and Cache**:
+   - Located in root directory (`sw.js`, not `js/sw.js`)
+   - `app.js` registers the SW with a query string: `sw.js?v=APP_VERSION`
+   - SW parses `v` parameter from its own script URL and sets `CACHE_NAME = \`tiddeli-pwa-v${APP_VERSION}\``
    - New versions create new cache names; activation cleans up old caches
+   - Uses network-first strategy for HTML and `config.js` to quickly pick up new versions
+   - Cache-first strategy for other static assets
 
 ## Update Mechanism
-- **Service worker registration**: Appends `?v=APP_VERSION` to SW URL; browser checks for updates on load
-- **Update detection**: Standard SW lifecycle (new file or URL triggers updatefound)
+- **Service worker registration**: Appends `?v=APP_VERSION` to SW URL (`sw.js?v=X.Y.Z`); browser checks for updates on load
+- **Update detection**: Standard SW lifecycle (new file or URL triggers `updatefound` event)
 - **Update strategy**:
   1. New SW installs in background, using versioned cache name
-  2. On activation, old caches are deleted
-  3. Page reload picks up new cached assets
-  4. Optional UI prompt can be added for "Update available"
- - **Cache management**: Graceful fallback if network/cache fails
+  2. SW calls `skipWaiting()` to activate immediately
+  3. On activation, old caches are deleted and new SW takes control
+  4. `app.js` listens for `controllerchange` event and automatically reloads the page once
+  5. Automatic reload ensures fresh assets are loaded from new cache
+- **Cache management**: 
+  - Network-first for HTML navigation and `config.js` (allows quick version detection)
+  - Cache-first for other static assets (images, CSS, etc.)
+  - Graceful fallback to cache if network fails
+
+## Version-Aware Install Banner
+- **Version tracking in localStorage**: 
+  - Stores last seen version in `installBannerLastVersionSeen` key
+  - Uses this to detect when `APP_VERSION` changes
+- **Smart banner display**:
+  - Banner automatically shows when version changes (even if previously snoozed)
+  - Banner can be snoozed for 7 days, but version changes override snooze
+  - After install attempt or dismiss, current version is marked as seen
+- **Integration with PWA install prompt**:
+  - Uses native `beforeinstallprompt` event
+  - Banner shows "Install" button only when install prompt is available
+  - Hides install UI once app is installed (detected via `appinstalled` event)
 
 ## Version Display in UI
 - `index.html` contains `Version <span id="app-version"></span>` in the drawer footer
-- `app.js` sets `#app-version` textContent from `APP_VERSION`
+- `app.js` imports `APP_VERSION` from `config.js` and sets `#app-version` textContent
 - Format: "Version X.Y.Z" (can be themed)
 
 # Development tools:
