@@ -142,27 +142,30 @@ function setupInstallPromptHandlers() {
     function showBanner() {
         if (banner) {
             banner.classList.remove('hidden');
-            banner.style.display = 'flex';
             // Force visible on mobile: position fixed under header, high z-index
             const header = document.querySelector('header');
-            const topOffset = header ? (header.getBoundingClientRect().bottom + window.scrollY) : 0;
-            banner.style.position = 'fixed';
-            banner.style.left = '0';
-            banner.style.right = '0';
-            banner.style.top = `${topOffset}px`;
-            banner.style.zIndex = '1000';
+            const topOffset = header ? header.offsetHeight : 0;
+            banner.style.cssText = `
+                display: flex !important;
+                position: fixed !important;
+                left: 0 !important;
+                right: 0 !important;
+                top: ${topOffset}px !important;
+                z-index: 1000 !important;
+                margin: 0 !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            `;
+            console.log('[Install] Banner element found and styled:', banner.getBoundingClientRect());
+        } else {
+            console.error('[Install] Banner element not found!');
         }
     }
 
     function hideBanner() {
         if (banner) {
             banner.classList.add('hidden');
-            banner.style.display = 'none';
-            banner.style.position = '';
-            banner.style.left = '';
-            banner.style.right = '';
-            banner.style.top = '';
-            banner.style.zIndex = '';
+            banner.style.cssText = 'display: none !important;';
         }
     }
 
