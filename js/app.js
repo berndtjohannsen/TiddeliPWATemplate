@@ -143,6 +143,14 @@ function setupInstallPromptHandlers() {
         if (banner) {
             banner.classList.remove('hidden');
             banner.style.display = 'flex';
+            // Force visible on mobile: position fixed under header, high z-index
+            const header = document.querySelector('header');
+            const topOffset = header ? (header.getBoundingClientRect().bottom + window.scrollY) : 0;
+            banner.style.position = 'fixed';
+            banner.style.left = '0';
+            banner.style.right = '0';
+            banner.style.top = `${topOffset}px`;
+            banner.style.zIndex = '1000';
         }
     }
 
@@ -150,6 +158,11 @@ function setupInstallPromptHandlers() {
         if (banner) {
             banner.classList.add('hidden');
             banner.style.display = 'none';
+            banner.style.position = '';
+            banner.style.left = '';
+            banner.style.right = '';
+            banner.style.top = '';
+            banner.style.zIndex = '';
         }
     }
 
