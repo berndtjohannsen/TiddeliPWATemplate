@@ -152,7 +152,11 @@ function setupInstallPromptHandlers() {
     }
 
     // If event fires later, react to it (secondary listener still ok)
-    window.addEventListener('beforeinstallprompt', () => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // The early listener already prevented default, but we still update state
+        if (!deferredInstallPrompt) {
+            deferredInstallPrompt = e;
+        }
         if (installItem) {
             installItem.classList.remove('hidden');
         }
@@ -179,12 +183,19 @@ function setupInstallPromptHandlers() {
     }
 
     // Always show a friendly banner on first eligible visit, even before the install event
-    // If install prompt isn't available yet, hide the Install button and only show OK
-    if (!isStandalone() && canShowBanner()) {
+    // If install prompt isn't available yet, hide the Install button and only show Not now
+    if (!isStandalone() && canShowBanner() && banner) {
         showBanner();
         if (!deferredInstallPrompt && bannerInstall) {
             bannerInstall.classList.add('hidden');
         }
+        console.log('[Install] Banner shown on first visit');
+    } else {
+        console.log('[Install] Banner not shown:', {
+            isStandalone: isStandalone(),
+            canShow: canShowBanner(),
+            bannerExists: !!banner
+        });
     }
 
     // Handle install button click to trigger the prompt
