@@ -140,26 +140,74 @@ function setupInstallPromptHandlers() {
     }
 
     function showBanner() {
-        if (banner) {
-            banner.classList.remove('hidden');
-            // Force visible on mobile: position fixed under header, high z-index
-            const header = document.querySelector('header');
-            const topOffset = header ? header.offsetHeight : 0;
-            banner.style.cssText = `
-                display: flex !important;
-                position: fixed !important;
-                left: 0 !important;
-                right: 0 !important;
-                top: ${topOffset}px !important;
-                z-index: 1000 !important;
-                margin: 0 !important;
-                width: 100% !important;
-                box-sizing: border-box !important;
-            `;
-            console.log('[Install] Banner element found and styled:', banner.getBoundingClientRect());
-        } else {
+        if (!banner) {
             console.error('[Install] Banner element not found!');
+            return;
         }
+        
+        // Ensure banner is at body level (move if needed)
+        if (banner.parentElement !== document.body) {
+            document.body.insertBefore(banner, document.body.firstChild);
+        }
+        
+        // Create content if missing (in case HTML was simplified)
+        const existingDismiss = banner.querySelector('#banner-dismiss');
+        const existingInstall = banner.querySelector('#banner-install');
+        if (!existingDismiss || !existingInstall) {
+            banner.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="padding-right: 12px; font-size: 14px; flex: 1;">For the best experience, install this app on your device.</div>
+                    <div style="display: flex; gap: 8px; flex-shrink: 0;">
+                        <button id="banner-dismiss" style="padding: 4px 12px; border-radius: 6px; background: transparent; color: #1e40af; border: none; white-space: nowrap; cursor: pointer;">Not now</button>
+                        <button id="banner-install" style="padding: 4px 12px; border-radius: 6px; background: #2563eb; color: white; border: none; white-space: nowrap; cursor: pointer;">Install</button>
+                    </div>
+                </div>
+            `;
+            // Re-attach handlers to newly created buttons
+            const newDismiss = document.getElementById('banner-dismiss');
+            const newInstall = document.getElementById('banner-install');
+            if (newDismiss) {
+                newDismiss.addEventListener('click', () => {
+                    const until = Date.now() + SNOOZE_MS;
+                    localStorage.setItem(SNOOZE_KEY, String(until));
+                    hideBanner();
+                });
+            }
+            if (newInstall) {
+                newInstall.addEventListener('click', async () => {
+                    if (!deferredInstallPrompt) {
+                        hideBanner();
+                        return;
+                    }
+                    deferredInstallPrompt.prompt();
+                    const choice = await deferredInstallPrompt.userChoice;
+                    deferredInstallPrompt = null;
+                    hideBanner();
+                    if (installItem) {
+                        installItem.classList.add('hidden');
+                    }
+                });
+            }
+        }
+        
+        banner.classList.remove('hidden');
+        // Force visible: position fixed under header
+        const header = document.querySelector('header');
+        const topOffset = header ? header.offsetHeight : 0;
+        banner.style.cssText = `
+            display: block !important;
+            position: fixed !important;
+            left: 0 !important;
+            right: 0 !important;
+            top: ${topOffset}px !important;
+            z-index: 1000 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+            background-color: #eff6ff !important;
+            border-bottom: 1px solid #bfdbfe !important;
+        `;
+        console.log('[Install] Banner shown:', banner.getBoundingClientRect());
     }
 
     function hideBanner() {
