@@ -88,11 +88,8 @@ function setupEventListeners() {
     
     // Bottom navigation click handlers
     const navItems = document.querySelectorAll('.bottom-nav-item');
-    console.log('[Bottom Nav] Found', navItems.length, 'navigation items');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
-            console.log('[Bottom Nav] Item clicked:', item, 'Route:', item.dataset.route);
-            
             // Handle navigation - let the router update the active state
             const route = item.dataset.route;
             if (route && window.router) {
