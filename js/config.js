@@ -4,7 +4,7 @@
  */
 
 // Application version - Update this when releasing new versions
-export const APP_VERSION = '1.0.348';
+export const APP_VERSION = '1.0.349';
 
 // Application name
 export const APP_NAME = 'Tiddeli PWA Template';
