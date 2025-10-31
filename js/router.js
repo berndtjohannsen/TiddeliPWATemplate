@@ -32,19 +32,46 @@ const routes = {
 let currentRoute = '/';
 
 /**
+ * Get the base path of the application (e.g., '' or '/TiddeliPWATemplate')
+ * This handles both local development and GitHub Pages deployment
+ */
+function getBasePath() {
+    const path = window.location.pathname;
+    // If path starts with something other than just '/', extract base path
+    // For GitHub Pages: /TiddeliPWATemplate/ -> /TiddeliPWATemplate
+    // For local: / -> ''
+    const match = path.match(/^(\/[^\/]+)/);
+    return match ? match[1] : '';
+}
+
+/**
+ * Normalize a route path by removing base path if present
+ * @param {string} path - The full path including base path
+ * @returns {string} Normalized path without base path
+ */
+function normalizePath(path) {
+    const basePath = getBasePath();
+    console.log('[Router] Normalizing path:', path, 'base:', basePath);
+    if (basePath && path.startsWith(basePath)) {
+        const normalized = path.substring(basePath.length) || '/';
+        console.log('[Router] Normalized to:', normalized);
+        return normalized;
+    }
+    return path;
+}
+
+/**
  * Initialize the router
  */
 export function initRouter() {
     console.log('[Router] Initializing router');
-    // Handle initial route
-    handleRoute();
     
     // Listen for browser back/forward buttons
     window.addEventListener('popstate', handleRoute);
     
     // Handle initial navigation
-    const path = window.location.pathname;
-    console.log('[Router] Initial path:', path);
+    const path = normalizePath(window.location.pathname);
+    console.log('[Router] Initial normalized path:', path);
     navigate(path);
 }
 
@@ -52,14 +79,14 @@ export function initRouter() {
  * Handle route changes
  */
 function handleRoute() {
-    const path = window.location.pathname;
-    console.log('[Router] handleRoute called with path:', path);
+    const path = normalizePath(window.location.pathname);
+    console.log('[Router] handleRoute called with normalized path:', path);
     navigate(path);
 }
 
 /**
  * Navigate to a route
- * @param {string} path - The path to navigate to
+ * @param {string} path - The path to navigate to (should be normalized)
  */
 function navigate(path) {
     console.log('[Router] navigate() called with path:', path);
@@ -69,10 +96,15 @@ function navigate(path) {
     // Update current route
     currentRoute = path;
     
+    // Build full URL with base path if needed
+    const basePath = getBasePath();
+    // Handle trailing slash: if path is '/', we want /TiddeliPWATemplate/, not /TiddeliPWATemplate/
+    const fullPath = basePath ? (path === '/' ? `${basePath}/` : `${basePath}${path}`) : path;
+    
     // Update URL if needed
-    if (window.location.pathname !== path) {
-        window.history.pushState({}, '', path);
-        console.log('[Router] Updated URL to:', path);
+    if (window.location.pathname !== fullPath) {
+        window.history.pushState({}, '', fullPath);
+        console.log('[Router] Updated URL to:', fullPath);
     }
     
     // Update page title
