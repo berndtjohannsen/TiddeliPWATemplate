@@ -90,6 +90,9 @@ function setupEventListeners() {
     const navItems = document.querySelectorAll('.bottom-nav-item');
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('[DEBUG] Nav click:', item.dataset.route);
             // Handle navigation - let the router update the active state
             const route = item.dataset.route;
             if (route && window.router) {
