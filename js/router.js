@@ -40,8 +40,8 @@ function getBasePath() {
     // If path starts with something other than just '/', extract base path
     // For GitHub Pages: /TiddeliPWATemplate/ -> /TiddeliPWATemplate
     // For local: / -> ''
-    const match = path.match(/^(\/[^\/]+)/);
-    return match ? match[1] : '';
+    const match = path.match(/^\/([^\/]+)/);
+    return match ? `/${match[1]}` : '';
 }
 
 /**
