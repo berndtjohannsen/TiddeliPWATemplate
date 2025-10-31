@@ -46,7 +46,11 @@ function initApp() {
 async function registerServiceWorker() {
     try {
         // Pass version to service worker via query string
-        const swUrl = `sw.js?v=${encodeURIComponent(APP_VERSION)}`;
+        // Use absolute path to ensure SW registers from root, not relative to current path
+        const swUrl = '/sw.js?v=' + encodeURIComponent(APP_VERSION);
+        console.log('Registering service worker from:', swUrl);
+        console.log('Current location:', window.location.href);
+        console.log('Current pathname:', window.location.pathname);
         const registration = await navigator.serviceWorker.register(swUrl);
         console.log('Service Worker registered:', registration);
         
@@ -119,6 +123,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 function setupInstallPromptHandlers() {
     const topInstallButton = document.getElementById('top-install-button');
+    const topInstallPlaceholder = document.getElementById('top-install-placeholder');
     const banner = document.getElementById('install-banner');
     const bannerInstall = document.getElementById('banner-install');
     const bannerDismiss = document.getElementById('banner-dismiss');
@@ -217,6 +222,9 @@ function setupInstallPromptHandlers() {
                     if (topInstallButton) {
                         topInstallButton.classList.add('hidden');
                     }
+                    if (topInstallPlaceholder) {
+                        topInstallPlaceholder.classList.remove('hidden');
+                    }
                 });
             }
         }
@@ -258,6 +266,9 @@ function setupInstallPromptHandlers() {
         if (topInstallButton) {
             topInstallButton.classList.remove('hidden');
         }
+        if (topInstallPlaceholder) {
+            topInstallPlaceholder.classList.add('hidden');
+        }
         if (!isStandalone() && canShowBanner()) {
             showBanner();
         }
@@ -271,6 +282,9 @@ function setupInstallPromptHandlers() {
     if (beforeInstallEventQueued) {
         if (topInstallButton) {
             topInstallButton.classList.remove('hidden');
+        }
+        if (topInstallPlaceholder) {
+            topInstallPlaceholder.classList.add('hidden');
         }
         if (!isStandalone() && canShowBanner()) {
             showBanner();
@@ -315,6 +329,9 @@ function setupInstallPromptHandlers() {
             if (topInstallButton) {
                 topInstallButton.classList.add('hidden');
             }
+            if (topInstallPlaceholder) {
+                topInstallPlaceholder.classList.remove('hidden');
+            }
             hideBanner();
             // Optionally track choice.outcome === 'accepted' | 'dismissed'
         });
@@ -337,6 +354,9 @@ function setupInstallPromptHandlers() {
             if (topInstallButton) {
                 topInstallButton.classList.add('hidden');
             }
+            if (topInstallPlaceholder) {
+                topInstallPlaceholder.classList.remove('hidden');
+            }
         });
     }
     if (bannerDismiss) {
@@ -352,6 +372,9 @@ function setupInstallPromptHandlers() {
     window.addEventListener('appinstalled', () => {
         if (topInstallButton) {
             topInstallButton.classList.add('hidden');
+        }
+        if (topInstallPlaceholder) {
+            topInstallPlaceholder.classList.remove('hidden');
         }
         hideBanner();
         console.log('[Install] App successfully installed!');

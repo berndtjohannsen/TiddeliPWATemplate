@@ -37,6 +37,10 @@ let currentRoute = '/';
  */
 function getBasePath() {
     const path = window.location.pathname;
+    // If path starts with index.html, we're in local dev and should not use base path
+    if (path.includes('/index.html')) {
+        return '';
+    }
     // If path starts with something other than just '/', extract base path
     // For GitHub Pages: /TiddeliPWATemplate/ -> /TiddeliPWATemplate
     // For local: / -> ''
@@ -50,6 +54,11 @@ function getBasePath() {
  * @returns {string} Normalized path without base path
  */
 function normalizePath(path) {
+    // If path is index.html, treat it as home route
+    if (path === '/index.html' || path.endsWith('/index.html')) {
+        return '/';
+    }
+    
     const basePath = getBasePath();
     if (basePath && path.startsWith(basePath)) {
         const normalized = path.substring(basePath.length) || '/';
