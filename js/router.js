@@ -113,24 +113,19 @@ function navigate(path) {
  * @param {string} path - The current path
  */
 function updateBottomNavActiveState(path) {
-    console.log('[DEBUG] updateBottomNavActiveState called with path:', path);
     const navItems = document.querySelectorAll('.bottom-nav-item');
-    console.log('[DEBUG] Found', navItems.length, 'nav items');
-    navItems.forEach((item, index) => {
+    navItems.forEach(item => {
         const route = item.dataset.route;
-        console.log('[DEBUG] Item', index, 'has route:', route, 'matches?', route === path);
         if (route === path) {
             // Set as active (blue background, white text)
             item.classList.add('bg-blue-600');
             item.classList.add('text-white');
             item.classList.remove('text-gray-600');
-            console.log('[DEBUG] Set item', index, 'to active, classes:', item.classList.toString());
         } else {
             // Set as inactive (no background, gray text)
             item.classList.remove('bg-blue-600');
             item.classList.remove('text-white');
             item.classList.add('text-gray-600');
-            console.log('[DEBUG] Set item', index, 'to inactive');
         }
     });
 }

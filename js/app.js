@@ -92,7 +92,6 @@ function setupEventListeners() {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('[DEBUG] Nav click:', item.dataset.route);
             // Handle navigation - let the router update the active state
             const route = item.dataset.route;
             if (route && window.router) {
@@ -119,8 +118,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     beforeInstallEventQueued = true;
 });
 function setupInstallPromptHandlers() {
-    const installItem = document.getElementById('install-app-item');
-    const installButton = document.getElementById('install-app-button');
+    const topInstallButton = document.getElementById('top-install-button');
     const banner = document.getElementById('install-banner');
     const bannerInstall = document.getElementById('banner-install');
     const bannerDismiss = document.getElementById('banner-dismiss');
@@ -216,8 +214,8 @@ function setupInstallPromptHandlers() {
                     deferredInstallPrompt = null;
                     markVersionSeen(); // Mark version as seen after install attempt
                     hideBanner();
-                    if (installItem) {
-                        installItem.classList.add('hidden');
+                    if (topInstallButton) {
+                        topInstallButton.classList.add('hidden');
                     }
                 });
             }
@@ -257,8 +255,8 @@ function setupInstallPromptHandlers() {
         if (!deferredInstallPrompt) {
             deferredInstallPrompt = e;
         }
-        if (installItem) {
-            installItem.classList.remove('hidden');
+        if (topInstallButton) {
+            topInstallButton.classList.remove('hidden');
         }
         if (!isStandalone() && canShowBanner()) {
             showBanner();
@@ -271,8 +269,8 @@ function setupInstallPromptHandlers() {
 
     // If the event already fired before handlers were attached, show UI now
     if (beforeInstallEventQueued) {
-        if (installItem) {
-            installItem.classList.remove('hidden');
+        if (topInstallButton) {
+            topInstallButton.classList.remove('hidden');
         }
         if (!isStandalone() && canShowBanner()) {
             showBanner();
@@ -305,17 +303,17 @@ function setupInstallPromptHandlers() {
         });
     }
 
-    // Handle install button click to trigger the prompt
-    if (installButton) {
-        installButton.addEventListener('click', async () => {
+    // Handle top install button click to trigger the prompt
+    if (topInstallButton) {
+        topInstallButton.addEventListener('click', async () => {
             if (!deferredInstallPrompt) {
                 return;
             }
             deferredInstallPrompt.prompt();
             const choice = await deferredInstallPrompt.userChoice;
             deferredInstallPrompt = null;
-            if (installItem) {
-                installItem.classList.add('hidden');
+            if (topInstallButton) {
+                topInstallButton.classList.add('hidden');
             }
             hideBanner();
             // Optionally track choice.outcome === 'accepted' | 'dismissed'
@@ -336,8 +334,8 @@ function setupInstallPromptHandlers() {
             deferredInstallPrompt = null;
             markVersionSeen(); // Mark version as seen after install attempt
             hideBanner();
-            if (installItem) {
-                installItem.classList.add('hidden');
+            if (topInstallButton) {
+                topInstallButton.classList.add('hidden');
             }
         });
     }
@@ -352,10 +350,11 @@ function setupInstallPromptHandlers() {
 
     // When app is installed, hide install UI
     window.addEventListener('appinstalled', () => {
-        if (installItem) {
-            installItem.classList.add('hidden');
+        if (topInstallButton) {
+            topInstallButton.classList.add('hidden');
         }
         hideBanner();
+        console.log('[Install] App successfully installed!');
     });
 }
 
