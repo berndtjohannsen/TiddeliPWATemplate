@@ -15,6 +15,17 @@
   body {
     @apply bg-gray-50 text-gray-900;
   }
+  
+  /* Prevent overscroll bouncing to keep top/bottom bars visible */
+  html {
+    overscroll-behavior-y: none;
+  }
+  
+  body {
+    overscroll-behavior-y: none;
+    /* Prevent iOS elastic scrolling effect */
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 @layer components {
