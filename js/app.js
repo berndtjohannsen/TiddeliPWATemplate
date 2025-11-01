@@ -46,11 +46,9 @@ function initApp() {
 async function registerServiceWorker() {
     try {
         // Pass version to service worker via query string
-        // Use absolute path to ensure SW registers from root, not relative to current path
-        const swUrl = '/sw.js?v=' + encodeURIComponent(APP_VERSION);
+        // Use relative path to work in both local dev and GitHub Pages
+        const swUrl = './sw.js?v=' + encodeURIComponent(APP_VERSION);
         console.log('Registering service worker from:', swUrl);
-        console.log('Current location:', window.location.href);
-        console.log('Current pathname:', window.location.pathname);
         const registration = await navigator.serviceWorker.register(swUrl);
         console.log('Service Worker registered:', registration);
         
