@@ -30,22 +30,35 @@ const routes = {
  * Current route state
  */
 let currentRoute = '/';
+let cachedBasePath = null;
 
 /**
  * Get the base path of the application (e.g., '' or '/TiddeliPWATemplate')
  * This handles both local development and GitHub Pages deployment
  */
 function getBasePath() {
+    // Cache the base path on first call to avoid recalculating on every navigation
+    if (cachedBasePath !== null) {
+        return cachedBasePath;
+    }
+    
     const path = window.location.pathname;
     // If path starts with index.html, we're in local dev and should not use base path
     if (path.includes('/index.html')) {
-        return '';
+        cachedBasePath = '';
+        return cachedBasePath;
+    }
+    // For GitHub Pages, we need to detect the base path from the initial URL
+    // Check if we're at the root or have a repo name in the path
+    if (path === '/' || path === '/index.html') {
+        cachedBasePath = '';
+        return cachedBasePath;
     }
     // If path starts with something other than just '/', extract base path
     // For GitHub Pages: /TiddeliPWATemplate/ -> /TiddeliPWATemplate
-    // For local: / -> ''
     const match = path.match(/^\/([^\/]+)/);
-    return match ? `/${match[1]}` : '';
+    cachedBasePath = match ? `/${match[1]}` : '';
+    return cachedBasePath;
 }
 
 /**
@@ -163,7 +176,52 @@ function getComponentContent(componentName) {
             <div class="p-4">
                 <h1 class="text-3xl font-bold mb-4">Welcome</h1>
                 <p class="text-gray-600">This is the home page of your PWA template.</p>
-                <p class="text-gray-600 mt-4">Start building your app here!</p>
+                
+                <!-- Sample Image -->
+                <div class="my-6">
+                    <img src="./images/icons/icon-192.png" alt="App Icon" class="w-32 h-32 mx-auto rounded-lg shadow-md">
+                </div>
+                
+                <!-- Sample Content Sections for Scrolling Test -->
+                <div class="space-y-4">
+                    <section class="bg-white p-4 rounded-lg shadow-sm">
+                        <h2 class="text-xl font-semibold mb-2">Features</h2>
+                        <p class="text-gray-600">This PWA template includes:</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1 text-gray-600">
+                            <li>Offline support via service worker</li>
+                            <li>Install prompt for better user experience</li>
+                            <li>Responsive design with Tailwind CSS</li>
+                            <li>Client-side routing</li>
+                            <li>Version management</li>
+                        </ul>
+                    </section>
+                    
+                    <section class="bg-white p-4 rounded-lg shadow-sm">
+                        <h2 class="text-xl font-semibold mb-2">Getting Started</h2>
+                        <p class="text-gray-600 mb-2">To customize this template:</p>
+                        <p class="text-gray-600">1. Update the navigation items to match your app sections</p>
+                        <p class="text-gray-600">2. Modify the content for each section in router.js</p>
+                        <p class="text-gray-600">3. Add your own styling and branding</p>
+                        <p class="text-gray-600">4. Configure the manifest.json for your app</p>
+                    </section>
+                    
+                    <section class="bg-white p-4 rounded-lg shadow-sm">
+                        <h2 class="text-xl font-semibold mb-2">Additional Content</h2>
+                        <p class="text-gray-600">This section demonstrates scrolling behavior on the home page.</p>
+                        <p class="text-gray-600 mt-2">You can add more content here to test how the page handles longer content and scrolling.</p>
+                    </section>
+                    
+                    <section class="bg-white p-4 rounded-lg shadow-sm">
+                        <h2 class="text-xl font-semibold mb-2">More Information</h2>
+                        <p class="text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                        <p class="text-gray-600 mt-2">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                    </section>
+                    
+                    <section class="bg-white p-4 rounded-lg shadow-sm mb-8">
+                        <h2 class="text-xl font-semibold mb-2">Footer Content</h2>
+                        <p class="text-gray-600">This is additional content at the bottom of the page to ensure there's enough scrollable content to test the bottom navigation behavior.</p>
+                    </section>
+                </div>
             </div>
         `,
         section1: `

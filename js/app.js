@@ -48,7 +48,6 @@ async function registerServiceWorker() {
         // Pass version to service worker via query string
         // Use relative path to work in both local dev and GitHub Pages
         const swUrl = './sw.js?v=' + encodeURIComponent(APP_VERSION);
-        console.log('Registering service worker from:', swUrl);
         const registration = await navigator.serviceWorker.register(swUrl);
         console.log('Service Worker registered:', registration);
         
@@ -96,6 +95,32 @@ function setupEventListeners() {
             e.stopPropagation();
             // Handle navigation - let the router update the active state
             const route = item.dataset.route;
+            if (route && window.router) {
+                // Navigate using router
+                window.router.navigate(route);
+            } else if (route) {
+                // Fallback: update URL and let popstate handle it
+                window.history.pushState({}, '', route);
+                window.dispatchEvent(new PopStateEvent('popstate'));
+            }
+        });
+    });
+    
+    // Drawer navigation click handlers
+    const drawerLinks = document.querySelectorAll('#drawer nav button');
+    drawerLinks.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Close drawer
+            if (drawer) {
+                drawer.classList.remove('translate-x-0');
+            }
+            if (drawerBackdrop) {
+                drawerBackdrop.classList.add('hidden');
+            }
+            // Handle navigation - let the router update the active state
+            const route = button.dataset.route;
             if (route && window.router) {
                 // Navigate using router
                 window.router.navigate(route);
